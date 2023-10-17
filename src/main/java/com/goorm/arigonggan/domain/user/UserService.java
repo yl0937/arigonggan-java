@@ -10,7 +10,15 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public User signUp(UserRequest userRequest) {
-        return User.from(userRequest);
+    public Long signIn(UserRequest userRequest) {
+        if (!userRepository.existsByStudentNum(userRequest.getStudentNum())) {
+            signUp(userRequest);
+        }
+        User user = userRepository.findByStudentNum(userRequest.getStudentNum());
+        return user.getId();
+    }
+
+    public void signUp(UserRequest userRequest) {
+        userRepository.save(User.from(userRequest));
     }
 }
