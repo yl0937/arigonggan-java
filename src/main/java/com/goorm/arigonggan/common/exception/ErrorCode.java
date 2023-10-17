@@ -8,6 +8,11 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, 40001, "입력값 유효성 검사에 실패하였습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, 40002, "사용자를 찾을 수 없습니다."),
+    INVALID_TOKEN(HttpStatus.BAD_REQUEST, 40003, "잘못된 토큰입니다."),
+    ACCESS_TOKEN_OMISSION(HttpStatus.UNAUTHORIZED, 40004, "인증 정보(액세스 토큰)가 누락되었습니다."),
+    EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, 40005, "만료된 액세스 토큰입니다."),
+    FORBIDDEN_REQUEST(HttpStatus.FORBIDDEN, 40300, "해당 요청에 대한 권한이 없습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50000, "예상치 못한 오류가 발생했습니다.");
 
 
