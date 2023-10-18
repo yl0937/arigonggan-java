@@ -32,8 +32,7 @@ public class SeatService {
     }
 
     public List<Seat> getSeatInfo(Time time) {
-        List<Seat> seatList = seatRepository.findByTime(time);
-        return seatList;
+        return seatRepository.findByTime(time);
     }
 
     public void updateSeatDisable(Time time) {
