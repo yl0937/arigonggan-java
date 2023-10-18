@@ -20,8 +20,9 @@ public class SeatService {
     public String getSeatStatus(SeatRequest seatRequest) {
 
         Seat seat = seatRepository.findByFloorAndNameAndTime(
-                seatRequest.getFloor(),seatRequest.getName(),Time.valueOf(seatRequest.getTime()))
-                .orElseThrow(()-> new BaseException(ErrorCode.USER_NOT_FOUND));
+                        seatRequest.getFloor(), seatRequest.getName(), Time.valueOf(seatRequest.getTime()))
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+        updateSeatDisable(Time.valueOf("10:00:00"));
         return seat.getStatus();
     }
 
@@ -29,4 +30,31 @@ public class SeatService {
         List<Seat> seatList = seatRepository.findAll();
         return seatList.stream().map(SeatResponse::fromSeat).collect(Collectors.toList());
     }
+
+    public List<Seat> getSeatInfo(Time time) {
+        List<Seat> seatList = seatRepository.findByTime(time);
+        return seatList;
+    }
+
+    public void updateSeatDisable(Time time) {
+        List<Seat> seatList = getSeatInfo(time);
+        for (Seat seat : seatList) {
+            seat.updateSeatStatus("disable");
+        }
+        seatRepository.saveAll(seatList);
+    }
+
+    public void updateSeatBooked(Seat seat) {
+        seat.updateSeatStatus("booked");
+        seatRepository.save(seat);
+    }
+
+    public void updateSeatActivate() {
+        List<Seat> seatList = seatRepository.findAll();
+        for (Seat seat : seatList) {
+            seat.updateSeatStatus("activate");
+        }
+        seatRepository.saveAll(seatList);
+    }
+
 }

@@ -21,4 +21,8 @@ public class Seat {
     private String name;
     private Time time;
     private String status;
+
+    public void updateSeatStatus(String status){
+        this.status = status;
+    }
 }
