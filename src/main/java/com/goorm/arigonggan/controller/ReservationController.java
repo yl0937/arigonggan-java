@@ -21,8 +21,15 @@ public class ReservationController {
     @PostMapping("/reservation")
     public SuccessResponse<?> seatStatus(@AuthenticationPrincipal Long userId,
                                               @RequestBody @Valid SeatRequest seatRequest) {
-        System.out.println(userId);
         reservationService.addReservation(userId,seatRequest);
+        return ResponseUtil.success();
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @DeleteMapping("/reservation")
+    public SuccessResponse<?> deleteReservation(@AuthenticationPrincipal Long userId,
+                                         @RequestBody @Valid SeatRequest seatRequest) {
+        reservationService.deleteReservation(userId,seatRequest);
         return ResponseUtil.success();
     }
 }

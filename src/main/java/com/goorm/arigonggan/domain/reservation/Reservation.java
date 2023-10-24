@@ -32,4 +32,8 @@ public class Reservation {
                 .updatedAt(LocalDateTime.now())
                 .build();
     }
+
+    public void updateStatus(String status) {
+        this.status = status;
+    }
 }

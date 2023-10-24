@@ -5,6 +5,7 @@ import com.goorm.arigonggan.common.exception.ErrorCode;
 import com.goorm.arigonggan.controller.dto.SeatRequest;
 import com.goorm.arigonggan.domain.seat.Seat;
 import com.goorm.arigonggan.domain.seat.SeatRepository;
+import com.goorm.arigonggan.domain.user.User;
 import com.goorm.arigonggan.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,29 @@ public class ReservationService {
     private final UserRepository userRepository;
 
     public void addReservation(Long userId, SeatRequest seatRequest) {
-        if (!userRepository.existsById(userId)) throw new BaseException(ErrorCode.USER_NOT_FOUND);
+        if (!userRepository.existsById(userId))
+            throw new BaseException(ErrorCode.USER_NOT_FOUND);
         Seat seat = seatRepository.findByFloorAndNameAndTime(seatRequest.getFloor(), seatRequest.getName(),
-                Time.valueOf(seatRequest.getTime())).orElseThrow((()->new BaseException(ErrorCode.USER_NOT_FOUND)));
+                Time.valueOf(seatRequest.getTime())).orElseThrow((() -> new BaseException(ErrorCode.USER_NOT_FOUND)));
         if (!(seat.getStatus()).equals("activate")) {
             throw new BaseException((ErrorCode.USER_NOT_FOUND));
         }
         reservationRepository.save(Reservation.from(userId, seat.getId(), "deactivation"));
+    }
+
+    public void deleteReservation(Long userId, SeatRequest seatRequest) {
+        // 없는 회원
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+        // 없는 좌석
+        Seat seat = seatRepository.findByFloorAndNameAndTime(seatRequest.getFloor(), seatRequest.getName(),
+                Time.valueOf(seatRequest.getTime())).orElseThrow((() -> new BaseException(ErrorCode.USER_NOT_FOUND)));
+        // 없는 예약
+        Reservation reservation = reservationRepository.findBySeatIdAndUserId(seat.getId(),user.getId())
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+        // 취소 불가 좌석
+        if ((reservation.getStatus()).equals("prebooked") || (reservation.getStatus()).equals("canceled")) throw new BaseException(ErrorCode.USER_NOT_FOUND);
+        reservation.updateStatus("deleted");
+        reservationRepository.save(reservation);
     }
 }
