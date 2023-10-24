@@ -4,6 +4,8 @@ import com.goorm.arigonggan.controller.dto.UserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -20,5 +22,13 @@ public class UserService {
 
     public void signUp(UserRequest userRequest) {
         userRepository.save(User.from(userRequest));
+    }
+
+    public void updateUserDisable(List<Long> userList) {
+        List<User> users = userRepository.findAllByIdIn(userList);
+        for (User user : users) {
+            user.updateStatus("disable");
+        }
+        userRepository.saveAll(users);
     }
 }

@@ -1,5 +1,6 @@
 package com.goorm.arigonggan.domain.reservation;
 
+import com.goorm.arigonggan.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @EnableScheduling
@@ -16,10 +18,18 @@ import java.time.LocalDateTime;
 public class ReservationSchedule {
 
     private final ReservationService reservationService;
+    private final UserService userService;
 
     @Scheduled(cron = "0 50 8-17 * * *")
-    public void prebookedReservation() {
+    public void prebookReservation() {
         Time time = Time.valueOf((LocalDateTime.now()).toLocalTime().plusMinutes(10));
-        reservationService.prebookedReservation(time);
+        reservationService.updateReservationStatus(time,"deactivation","prebooked");
+    }
+
+    @Scheduled(cron = "0 10 9-18 * * *")
+    public void cancelReservation() {
+        Time time = Time.valueOf((LocalDateTime.now()).toLocalTime().minusMinutes(10));
+        List<Long> userList = reservationService.updateReservationStatus(time,"prebooked","canceled");
+        userService.updateUserDisable(userList);
     }
 }

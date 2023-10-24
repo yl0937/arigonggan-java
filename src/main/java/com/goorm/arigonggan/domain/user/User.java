@@ -20,13 +20,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String studentNum;
+    private String status;
     @CreatedDate
     private LocalDateTime createdAt;
 
     public static User from(UserRequest userRequest) {
         return User.builder()
                 .studentNum(userRequest.getStudentNum())
+                .status("activate")
                 .createdAt(LocalDateTime.now())
                 .build();
+    }
+
+    public void updateStatus(String status) {
+        this.status = status;
     }
 }

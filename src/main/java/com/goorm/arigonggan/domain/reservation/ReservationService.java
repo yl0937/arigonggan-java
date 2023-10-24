@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -30,6 +31,8 @@ public class ReservationService {
             throw new BaseException((ErrorCode.DISABLE_SEAT));
         }
         reservationRepository.save(Reservation.from(userId, seat.getId(), seat.getTime(),"deactivation"));
+        seat.updateSeatStatus("booked");
+        seatRepository.save(seat);
     }
 
     public void deleteReservation(Long userId, SeatRequest seatRequest) {
@@ -48,11 +51,15 @@ public class ReservationService {
         reservationRepository.save(reservation);
     }
 
-    public void prebookedReservation(Time time) {
-        List<Reservation> reservationList = reservationRepository.findAllBySeatTimeAndStatus(time,"deactivation");
+    public List<Long> updateReservationStatus(Time time,String status, String newStatus) {
+        List<Reservation> reservationList = reservationRepository.findAllBySeatTimeAndStatus(time,status);
+        List<Long> userList = new ArrayList<>();
         for (Reservation reservation : reservationList) {
-            reservation.updateStatus("prebooked");
+            reservation.updateStatus(newStatus);
+            userList.add(reservation.getUserId());
         }
         reservationRepository.saveAll(reservationList);
+        return userList;
     }
+
 }
