@@ -24,9 +24,9 @@ public class ReservationService {
         if (!userRepository.existsById(userId))
             throw new BaseException(ErrorCode.USER_NOT_FOUND);
         Seat seat = seatRepository.findByFloorAndNameAndTime(seatRequest.getFloor(), seatRequest.getName(),
-                Time.valueOf(seatRequest.getTime())).orElseThrow((() -> new BaseException(ErrorCode.USER_NOT_FOUND)));
+                Time.valueOf(seatRequest.getTime())).orElseThrow((() -> new BaseException(ErrorCode.SEAT_NOT_FOUND)));
         if (!(seat.getStatus()).equals("activate")) {
-            throw new BaseException((ErrorCode.USER_NOT_FOUND));
+            throw new BaseException((ErrorCode.DISABLE_SEAT));
         }
         reservationRepository.save(Reservation.from(userId, seat.getId(), "deactivation"));
     }
@@ -37,12 +37,12 @@ public class ReservationService {
                 .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
         // 없는 좌석
         Seat seat = seatRepository.findByFloorAndNameAndTime(seatRequest.getFloor(), seatRequest.getName(),
-                Time.valueOf(seatRequest.getTime())).orElseThrow((() -> new BaseException(ErrorCode.USER_NOT_FOUND)));
+                Time.valueOf(seatRequest.getTime())).orElseThrow((() -> new BaseException(ErrorCode.SEAT_NOT_FOUND)));
         // 없는 예약
         Reservation reservation = reservationRepository.findBySeatIdAndUserId(seat.getId(),user.getId())
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(ErrorCode.RESERVATION_NOT_FOUND));
         // 취소 불가 좌석
-        if ((reservation.getStatus()).equals("prebooked") || (reservation.getStatus()).equals("canceled")) throw new BaseException(ErrorCode.USER_NOT_FOUND);
+        if ((reservation.getStatus()).equals("prebooked") || (reservation.getStatus()).equals("canceled")) throw new BaseException(ErrorCode.NOT_POSSIBLE_CANCELLATION);
         reservation.updateStatus("deleted");
         reservationRepository.save(reservation);
     }
