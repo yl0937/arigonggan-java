@@ -32,4 +32,9 @@ public class ReservationSchedule {
         List<Long> userList = reservationService.updateReservationStatus(time,"prebooked","canceled");
         userService.updateUserDisable(userList);
     }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void activateUser() {
+        userService.updateUserActivate();
+    }
 }

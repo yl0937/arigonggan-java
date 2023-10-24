@@ -31,4 +31,12 @@ public class UserService {
         }
         userRepository.saveAll(users);
     }
+
+    public void updateUserActivate() {
+        List<User> users = userRepository.findAllByStatus("disable");
+        for (User user: users) {
+            user.updateStatus("activate");
+        }
+        userRepository.saveAll(users);
+    }
 }
