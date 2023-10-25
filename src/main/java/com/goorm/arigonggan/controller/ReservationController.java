@@ -32,4 +32,12 @@ public class ReservationController {
         reservationService.deleteReservation(userId,seatRequest);
         return ResponseUtil.success();
     }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PatchMapping("/booked")
+    public SuccessResponse<?> bookReservation(@AuthenticationPrincipal Long userId,
+                                              @RequestBody @Valid SeatRequest seatRequest) {
+        reservationService.bookReservation(userId,seatRequest);
+        return ResponseUtil.success();
+    }
 }

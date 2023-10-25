@@ -29,6 +29,8 @@ public class ReservationService {
         if((user.getStatus()).equals("disable")) throw new BaseException(ErrorCode.DISABLE_USER);
         Seat seat = seatRepository.findByFloorAndNameAndTime(seatRequest.getFloor(), seatRequest.getName(),
                 Time.valueOf(seatRequest.getTime())).orElseThrow((() -> new BaseException(ErrorCode.SEAT_NOT_FOUND)));
+
+
         if (!(seat.getStatus()).equals("activate")) {
             throw new BaseException((ErrorCode.DISABLE_SEAT));
         }
@@ -39,13 +41,12 @@ public class ReservationService {
 
     public void deleteReservation(Long userId, SeatRequest seatRequest) {
         // 없는 회원
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+        if(!userRepository.existsById(userId)) throw new BaseException(ErrorCode.USER_NOT_FOUND);
         // 없는 좌석
         Seat seat = seatRepository.findByFloorAndNameAndTime(seatRequest.getFloor(), seatRequest.getName(),
                 Time.valueOf(seatRequest.getTime())).orElseThrow((() -> new BaseException(ErrorCode.SEAT_NOT_FOUND)));
         // 없는 예약
-        Reservation reservation = reservationRepository.findBySeatIdAndUserId(seat.getId(), user.getId())
+        Reservation reservation = reservationRepository.findBySeatIdAndUserId(seat.getId(), userId)
                 .orElseThrow(() -> new BaseException(ErrorCode.RESERVATION_NOT_FOUND));
         // 취소 불가 좌석
         if ((reservation.getStatus()).equals("prebooked") || (reservation.getStatus()).equals("canceled"))
@@ -63,6 +64,22 @@ public class ReservationService {
         }
         reservationRepository.saveAll(reservationList);
         return userList;
+    }
+
+    public void bookReservation(Long userId, SeatRequest seatRequest) {
+        // 없는 회원
+        if(!userRepository.existsById(userId)) throw new BaseException(ErrorCode.USER_NOT_FOUND);
+        // 없는 좌석
+        Seat seat = seatRepository.findByFloorAndNameAndTime(seatRequest.getFloor(), seatRequest.getName(),
+                Time.valueOf(seatRequest.getTime())).orElseThrow((() -> new BaseException(ErrorCode.SEAT_NOT_FOUND)));
+        // 없는 예약
+        Reservation reservation = reservationRepository.findBySeatIdAndUserId(seat.getId(), userId)
+                .orElseThrow(() -> new BaseException(ErrorCode.RESERVATION_NOT_FOUND));
+        // 취소 불가 좌석
+        if (!reservation.getStatus().equals("prebooked"))
+            throw new BaseException(ErrorCode.CANNOT_BOOKED);
+        reservation.updateStatus("booked");
+        reservationRepository.save(reservation);
     }
 
 }
