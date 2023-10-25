@@ -1,13 +1,12 @@
-package com.goorm.arigonggan.domain.user;
+package com.goorm.arigonggan.domain.reservation;
 
-import com.goorm.arigonggan.controller.dto.UserRequest;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.sql.Time;
 import java.time.LocalDateTime;
 
 @Getter
@@ -15,20 +14,25 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class User {
+public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String studentNum;
+    private Long userId;
+    private Long seatId;
     private String status;
-    @CreatedDate
+    private Time seatTime;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    public static User from(UserRequest userRequest) {
-        return User.builder()
-                .studentNum(userRequest.getStudentNum())
-                .status("activate")
+    public static Reservation from(Long user, Long seatId, Time seatTime, String status) {
+        return Reservation.builder()
+                .userId(user)
+                .seatId(seatId)
+                .status(status)
+                .seatTime(seatTime)
                 .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 

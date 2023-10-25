@@ -21,7 +21,7 @@ public class SeatService {
 
         Seat seat = seatRepository.findByFloorAndNameAndTime(
                         seatRequest.getFloor(), seatRequest.getName(), Time.valueOf(seatRequest.getTime()))
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(ErrorCode.SEAT_NOT_FOUND));
         updateSeatDisable(Time.valueOf("10:00:00"));
         return seat.getStatus();
     }
@@ -41,11 +41,6 @@ public class SeatService {
             seat.updateSeatStatus("disable");
         }
         seatRepository.saveAll(seatList);
-    }
-
-    public void updateSeatBooked(Seat seat) {
-        seat.updateSeatStatus("booked");
-        seatRepository.save(seat);
     }
 
     public void updateSeatActivate() {
